@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-brand-dark text-brand-text antialiased overflow-x-hidden;
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+/* Custom safety UI glowing styles */
+.glow-safe {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+}
+
+.glow-warning {
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+  animation: warning-pulse 2s infinite ease-in-out;
+}
+
+.glow-critical {
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+  animation: danger-pulse 1.5s infinite ease-in-out;
+}
+
+.glow-text-critical {
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Radar scan lines overlay */
+.radar-grid {
+  background-image: 
+    linear-gradient(rgba(31, 41, 61, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 41, 61, 0.4) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Scanning line overlay */
+.cctv-scanline::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 2;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+@keyframes warning-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.45);
+  }
+}
+
+@keyframes danger-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+    background-color: rgba(239, 68, 68, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(239, 68, 68, 0.6);
+    background-color: rgba(239, 68, 68, 0.12);
+  }
+}
+
+/* Custom dark scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0f1d;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f293d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}

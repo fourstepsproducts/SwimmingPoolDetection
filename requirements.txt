@@ -1,0 +1,52 @@
+SWIMMING POOL SAFETY AI
+SOFTWARE REQUIREMENTS
+=====================
+
+INSTALLED NOW (CURRENT INITIAL STACK)
+--------------------------------------
+SYSTEM SOFTWARE:
+- Node.js (v22.18.0)
+- npm (v10.9.3)
+- Python (v3.13.6)
+
+FRONTEND FRAMEWORK (Vite + React JS):
+- react (^19.2.8)
+- react-dom (^19.2.8)
+
+FRONTEND LIBRARIES:
+- react-router-dom (v6 routing structure)
+- axios (HTTP central API configurations)
+- socket.io-client (real-time stream connectivity)
+- lucide-react (vector icons)
+- recharts (safety analytic trends visualization)
+- react-hot-toast (real-time operator warnings)
+- tailwindcss (utility styling engine)
+- postcss & autoprefixer (CSS building integration)
+- react-is (required peer dependency for recharts)
+
+BACKEND FRAMEWORK (Node.js + Express):
+- express (REST API setup)
+- cors (cross-origin resource security configuration)
+- dotenv (environmental setup)
+- socket.io (real-time alarm events engine)
+- mongoose (MongoDB client object modeling)
+- multer (multipart file uploads)
+
+BACKEND DEVELOPMENT TOOLING:
+- nodemon (auto-reloading dev environment)
+
+PYTHON AI / COMPUTER VISION:
+- ultralytics (YOLO object detection engine)
+- opencv-python (CCTV/RTSP frame and image processing)
+- numpy (multidimensional array processing)
+
+
+REQUIRED LATER / FUTURE PHASE (NOT INSTALLED)
+---------------------------------------------
+DATABASE STORAGE:
+- MongoDB Community Server (swimmer log persistence)
+
+FUTURE INFRASTRUCTURE:
+- CCTV Camera / RTSP video streams
+- AI processing hardware (dedicated GPU server)
+- SMS/Email Notification Services
