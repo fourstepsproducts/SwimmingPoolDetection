@@ -36,12 +36,20 @@ const TestUpload = () => {
   const maxUploadSizeGb = parseFloat(import.meta.env.VITE_MAX_UPLOAD_SIZE_GB || '5');
   const maxUploadSizeBytes = maxUploadSizeGb * 1024 * 1024 * 1024;
 
-  const poolPoints = {
-    A: { x: parseFloat(import.meta.env.VITE_POOL_POINT_A_X || '600'), y: parseFloat(import.meta.env.VITE_POOL_POINT_A_Y || '300') },
-    B: { x: parseFloat(import.meta.env.VITE_POOL_POINT_B_X || '1320'), y: parseFloat(import.meta.env.VITE_POOL_POINT_B_Y || '300') },
-    C: { x: parseFloat(import.meta.env.VITE_POOL_POINT_C_X || '1800'), y: parseFloat(import.meta.env.VITE_POOL_POINT_C_Y || '950') },
-    D: { x: parseFloat(import.meta.env.VITE_POOL_POINT_D_X || '120'), y: parseFloat(import.meta.env.VITE_POOL_POINT_D_Y || '950') }
-  };
+  const [poolPoints, setPoolPoints] = useState(null);
+
+  useEffect(() => {
+    const host = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+    axios.get(`${host}/api/calibration`)
+      .then((res) => {
+        if (res.data?.poolCorners?.length >= 4) {
+          setPoolPoints(res.data.poolCorners);
+        } else if (res.data?.waterBoundary?.length >= 4) {
+          setPoolPoints(res.data.waterBoundary);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -165,7 +173,9 @@ const TestUpload = () => {
 
     const formData = new FormData();
     formData.append('video', selectedVideo);
-    formData.append('poolPoints', JSON.stringify(poolPoints));
+    if (poolPoints) {
+      formData.append('poolPoints', JSON.stringify(poolPoints));
+    }
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -229,7 +239,9 @@ const TestUpload = () => {
 
     const formData = new FormData();
     formData.append('image', selectedImage);
-    formData.append('poolPoints', JSON.stringify(poolPoints));
+    if (poolPoints) {
+      formData.append('poolPoints', JSON.stringify(poolPoints));
+    }
 
     setIsAnalyzing(true);
     setAnalyzeType('image');

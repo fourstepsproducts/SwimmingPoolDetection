@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAnalysis } from '../context/AnalysisContext';
 import { 
   Layers, 
@@ -17,17 +17,19 @@ const DEFAULT_POOL_VIDEO = '/sample-pool.mp4';
 const PoolMarkings = () => {
   const { analysisResult } = useAnalysis();
   const host = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+  const videoRef = useRef(null);
 
   const [activeMediaUrl, setActiveMediaUrl] = useState(DEFAULT_POOL_VIDEO);
   const [activeMediaType, setActiveMediaType] = useState('video');
   const [mediaList, setMediaList] = useState([]);
+  const [liveDetections, setLiveDetections] = useState([]);
 
-  // Calibration corner state (4 actual water-surface corners)
+  // Calibration corner state (4 actual water-surface corners: TL, TR, BR, BL)
   const [corners, setCorners] = useState([
-    { x: 745.0, y: 75.0, label: 'TL (Top-Left)' },
-    { x: 1275.0, y: 75.0, label: 'TR (Top-Right)' },
-    { x: 1775.0, y: 405.0, label: 'BR (Bottom-Right)' },
-    { x: 560.0, y: 430.0, label: 'BL (Bottom-Left)' },
+    { x: 771.3, y: 85.4, label: 'TL (Top-Left)' },
+    { x: 1276.6, y: 74.0, label: 'TR (Top-Right)' },
+    { x: 1750.0, y: 396.9, label: 'BR (Bottom-Right)' },
+    { x: 526.4, y: 462.9, label: 'BL (Bottom-Left)' },
   ]);
 
   const [showBoundary, setShowBoundary] = useState(true);
@@ -89,6 +91,31 @@ const PoolMarkings = () => {
         }
       });
   }, [host, analysisResult]);
+
+  const syncDetectionsFromVideo = useCallback(() => {
+    if (!showDetections || !analysisResult?.frameStats?.length || !videoRef.current) {
+      return;
+    }
+    const outputFps = analysisResult.outputFps || 1;
+    const frameIndex = Math.floor(videoRef.current.currentTime * outputFps);
+    const idx = Math.max(0, Math.min(frameIndex, analysisResult.frameStats.length - 1));
+    const frame = analysisResult.frameStats[idx];
+    setLiveDetections(frame?.detections || []);
+  }, [showDetections, analysisResult]);
+
+  useEffect(() => {
+    if (!showDetections) {
+      setLiveDetections([]);
+      return;
+    }
+    if (analysisResult?.frameStats?.length) {
+      setLiveDetections(analysisResult.frameStats[0].detections || []);
+    } else if (analysisResult?.detections) {
+      setLiveDetections(analysisResult.detections);
+    } else {
+      setLiveDetections([]);
+    }
+  }, [showDetections, analysisResult]);
 
   const refW = 1920.0;
   const refH = 1080.0;
@@ -173,14 +200,17 @@ const PoolMarkings = () => {
         <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden radar-grid p-4">
           <div className="relative max-w-full max-h-[72vh] aspect-video w-full flex items-center justify-center rounded-lg overflow-hidden border border-brand-border/60 shadow-2xl bg-brand-dark/80">
             {activeMediaType === 'video' ? (
-              <video 
+              <video
+                ref={videoRef}
                 key={currentMediaSrc}
-                src={currentMediaSrc} 
-                controls 
-                autoPlay 
-                loop 
-                muted 
-                className="w-full h-full object-contain" 
+                src={currentMediaSrc}
+                controls
+                autoPlay
+                loop
+                muted
+                onTimeUpdate={syncDetectionsFromVideo}
+                onSeeked={syncDetectionsFromVideo}
+                className="w-full h-full object-contain"
               />
             ) : (
               <img 
@@ -223,7 +253,7 @@ const PoolMarkings = () => {
                 </>
               )}
 
-              {showDetections && analysisResult?.detections && analysisResult.detections.map((person, index) => (
+              {showDetections && liveDetections.map((person, index) => (
                 <g key={`${person.zone}-${index}`}>
                   <circle
                     cx={person.position?.x ?? 0}

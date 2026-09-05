@@ -1,0 +1,3 @@
+opencv-python>=4.8,<4.11
+ultralytics
+numpy>=1.23,<2
